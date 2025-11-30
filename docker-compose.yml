@@ -1,0 +1,96 @@
+# Defensio Miner - Docker Compose
+# ================================
+# Deploy multiple mining instances with ease
+
+version: '3.8'
+
+services:
+  # Single GPU miner
+  miner-gpu0:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: defensio-miner:latest
+    container_name: defensio-miner-gpu0
+    restart: unless-stopped
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+      - DEFENSIO_WALLET_DIR=/data/wallets
+      - DEFENSIO_LOG_DIR=/data/logs
+      # Uncomment to enable consolidation
+      # - CONSOLIDATE_ADDRESS=addr1qxy...
+    volumes:
+      - miner-data-gpu0:/data
+    command: ["--gpu", "0", "--cpu-workers", "2"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+
+  # Second GPU (uncomment for multi-GPU)
+  # miner-gpu1:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   image: defensio-miner:latest
+  #   container_name: defensio-miner-gpu1
+  #   restart: unless-stopped
+  #   runtime: nvidia
+  #   environment:
+  #     - NVIDIA_VISIBLE_DEVICES=1
+  #     - DEFENSIO_WALLET_DIR=/data/wallets
+  #     - DEFENSIO_LOG_DIR=/data/logs
+  #   volumes:
+  #     - miner-data-gpu1:/data
+  #   command: ["--gpu", "0", "--cpu-workers", "2"]
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             device_ids: ['1']
+  #             capabilities: [gpu]
+
+  # CPU-only miner instance
+  miner-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: defensio-miner:latest
+    container_name: defensio-miner-cpu
+    restart: unless-stopped
+    environment:
+      - DEFENSIO_WALLET_DIR=/data/wallets
+      - DEFENSIO_LOG_DIR=/data/logs
+    volumes:
+      - miner-data-cpu:/data
+    command: ["--cpu-workers", "8"]
+    # No GPU resources needed
+    profiles:
+      - cpu-only
+
+volumes:
+  miner-data-gpu0:
+  # miner-data-gpu1:
+  miner-data-cpu:
+
+# Usage:
+# =======
+# Build and run GPU miner:
+#   docker-compose up -d miner-gpu0
+#
+# Run CPU-only miner:
+#   docker-compose --profile cpu-only up -d miner-cpu
+#
+# View logs:
+#   docker-compose logs -f miner-gpu0
+#
+# Stop all:
+#   docker-compose down
+#
+# Build only:
+#   docker-compose build

@@ -1,0 +1,27 @@
+# Defensio Miner - Python Dependencies
+
+# Core dependencies
+requests>=2.28.0
+numpy>=1.21.0
+
+# Cardano wallet support
+pycardano>=0.10.0
+mnemonic>=0.20
+
+# Terminal dashboard (optional but recommended)
+rich>=13.0.0
+
+# Web dashboard (optional)
+flask>=2.0.0
+flask-cors>=3.0.0
+flask-socketio>=5.0.0
+
+# System monitoring
+psutil>=5.9.0
+
+# Optional: GPU support (uncomment for your CUDA version)
+# cupy-cuda12x>=12.0.0
+# cupy-cuda11x>=11.0.0
+
+# Optional: Enhanced file locking
+# portalocker>=2.0.0
